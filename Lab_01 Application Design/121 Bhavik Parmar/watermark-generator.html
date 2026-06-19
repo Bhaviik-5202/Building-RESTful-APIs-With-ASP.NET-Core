@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WatermarkStudio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #0d0f14; color: #e2e8f0; }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #1a1d26; }
+    ::-webkit-scrollbar-thumb { background: #3d4568; border-radius: 4px; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .panel { background: #13161f; border: 1px solid #1e2235; border-radius: 12px; }
+    .input-field {
+      background: #0d0f14;
+      border: 1px solid #1e2235;
+      border-radius: 8px;
+      color: #e2e8f0;
+      padding: 8px 12px;
+      font-size: 14px;
+      width: 100%;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .input-field:focus { border-color: #6366f1; }
+    .input-field::placeholder { color: #4b5280; }
+    .accent-btn {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: opacity .2s, transform .1s;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .accent-btn:hover { opacity: .9; transform: translateY(-1px); }
+    .accent-btn:active { transform: translateY(0); }
+    .accent-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+    .ghost-btn {
+      background: #1e2235;
+      color: #a0aec0;
+      border: 1px solid #2a2f4a;
+      border-radius: 8px;
+      padding: 9px 18px;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background .2s, color .2s;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .ghost-btn:hover { background: #252a40; color: #e2e8f0; }
+    .label { font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+    .range-input { -webkit-appearance: none; width: 100%; height: 4px; border-radius: 2px; background: #1e2235; outline: none; }
+    .range-input::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #6366f1; cursor: pointer; box-shadow: 0 0 0 3px #6366f120; }
+    .range-input::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: #6366f1; cursor: pointer; border: none; }
+    .tab { padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all .2s; color: #6b7280; }
+    .tab.active { background: #1e2235; color: #e2e8f0; }
+    .tab:hover:not(.active) { color: #a0aec0; }
+    .drop-zone {
+      border: 2px dashed #1e2235;
+      border-radius: 12px;
+      transition: border-color .2s, background .2s;
+      cursor: pointer;
+    }
+    .drop-zone.drag-over { border-color: #6366f1; background: #6366f108; }
+    .badge { display: inline-flex; align-items: center; gap: 4px; background: #1e2235; border: 1px solid #2a2f4a; border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 600; color: #a0aec0; }
+    .badge.active-badge { background: #6366f115; border-color: #6366f140; color: #818cf8; }
+    #canvas-container { position: relative; display: flex; align-items: center; justify-content: center; min-height: 400px; }
+    canvas { max-width: 100%; border-radius: 8px; display: block; }
+    .pos-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 4px; width: 108px; }
+    .pos-cell { width: 32px; height: 32px; border-radius: 6px; border: 1px solid #1e2235; background: #0d0f14; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+    .pos-cell:hover { border-color: #6366f1; }
+    .pos-cell.selected { background: #6366f1; border-color: #6366f1; }
+    .color-swatch { width: 28px; height: 28px; border-radius: 6px; border: 2px solid transparent; cursor: pointer; transition: border-color .15s; }
+    .color-swatch.selected { border-color: #6366f1; }
+    .section-divider { border: none; border-top: 1px solid #1e2235; margin: 20px 0; }
+    .toast { position: fixed; bottom: 24px; right: 24px; background: #252a40; border: 1px solid #2a2f4a; border-radius: 10px; padding: 12px 18px; font-size: 13px; color: #e2e8f0; display: flex; align-items: center; gap: 10px; transform: translateY(80px); opacity: 0; transition: all .3s; z-index: 999; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .tag-dot { width: 8px; height: 8px; border-radius: 50%; background: #6366f1; flex-shrink: 0; }
+    select.input-field { cursor: pointer; }
+    option { background: #13161f; }
+  </style>
+</head>
+<body>
+
+<div class="min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header style="border-bottom:1px solid #1e2235;" class="sticky top-0 z-50 flex items-center justify-between px-6 py-4" id="app-header">
+    <div class="flex items-center gap-3">
+      <div style="background:linear-gradient(135deg,#6366f1,#8b5cf6); border-radius:8px;" class="w-8 h-8 flex items-center justify-center flex-shrink-0">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div>
+        <div class="font-bold text-sm tracking-wide" style="color:#e2e8f0;">WatermarkStudio</div>
+        <div class="mono text-xs" style="color:#4b5280;">v1.0 · browser-only</div>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="badge active-badge">
+        <span class="tag-dot"></span> No upload · 100% local
+      </span>
+    </div>
+  </header>
+
+  <main class="flex flex-1 gap-0" style="min-height:calc(100vh - 65px);">
+
+    <!-- LEFT PANEL: Controls -->
+    <aside class="w-80 flex-shrink-0 flex flex-col gap-0 overflow-y-auto" style="border-right:1px solid #1e2235; padding: 20px 16px;">
+
+      <!-- Upload -->
+      <div class="panel p-4 mb-4">
+        <div class="label mb-3">Source Image</div>
+        <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+          <input type="file" id="file-input" accept="image/*" class="hidden"/>
+          <div id="upload-prompt" class="flex flex-col items-center justify-center py-8 gap-3">
+            <div style="background:#1e2235; border-radius:10px;" class="w-12 h-12 flex items-center justify-center">
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="text-center">
+              <div class="text-sm font-medium" style="color:#a0aec0;">Drop image here</div>
+              <div class="text-xs mt-1" style="color:#4b5280;">or click to browse · JPG, PNG, WEBP</div>
+            </div>
+          </div>
+          <div id="upload-info" class="hidden px-4 py-3 flex items-center gap-3">
+            <div style="background:#6366f115; border-radius:8px;" class="w-9 h-9 flex items-center justify-center flex-shrink-0">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="#6366f1" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="#6366f1"/><path d="M21 15l-5-5L5 21" stroke="#6366f1" stroke-width="2" stroke-linecap="round"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium truncate" id="file-name" style="color:#e2e8f0;">image.png</div>
+              <div class="text-xs mt-0.5" id="file-dims" style="color:#4b5280;">—</div>
+            </div>
+            <button onclick="clearImage(event)" class="text-xs ghost-btn py-1 px-2">✕</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Watermark Type -->
+      <div class="panel p-4 mb-4">
+        <div class="label mb-3">Watermark Type</div>
+        <div class="flex gap-1 mb-4" style="background:#0d0f14; border-radius:8px; padding:4px;">
+          <button class="tab active flex-1 text-center" id="tab-text" onclick="switchTab('text')">Text</button>
+          <button class="tab flex-1 text-center" id="tab-image" onclick="switchTab('image')">Image / Logo</button>
+        </div>
+
+        <!-- Text controls -->
+        <div id="text-controls">
+          <div class="mb-3">
+            <div class="label">Watermark Text</div>
+            <input type="text" id="wm-text" class="input-field" placeholder="© Your Brand 2025" value="© WatermarkStudio" oninput="render()"/>
+          </div>
+          <div class="mb-3">
+            <div class="label">Font</div>
+            <select id="wm-font" class="input-field" onchange="render()">
+              <option value="Inter, sans-serif">Inter (Sans)</option>
+              <option value="Georgia, serif">Georgia (Serif)</option>
+              <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
+              <option value="Arial, sans-serif">Arial</option>
+              <option value="'Times New Roman', serif">Times New Roman</option>
+              <option value="Impact, sans-serif">Impact</option>
+            </select>
+          </div>
+          <div class="flex gap-3 mb-3">
+            <div class="flex-1">
+              <div class="label">Size</div>
+              <input type="number" id="wm-size" class="input-field" value="32" min="8" max="200" oninput="render()"/>
+            </div>
+            <div class="flex-1">
+              <div class="label">Style</div>
+              <select id="wm-style" class="input-field" onchange="render()">
+                <option value="normal">Normal</option>
+                <option value="bold">Bold</option>
+                <option value="italic">Italic</option>
+                <option value="bold italic">Bold Italic</option>
+              </select>
+            </div>
+          </div>
+          <div class="mb-3">
+            <div class="label">Color</div>
+            <div class="flex gap-2 flex-wrap mb-2" id="color-swatches">
+              <div class="color-swatch selected" style="background:#ffffff;" data-color="#ffffff" onclick="pickColor(this)"></div>
+              <div class="color-swatch" style="background:#000000;" data-color="#000000" onclick="pickColor(this)"></div>
+              <div class="color-swatch" style="background:#6366f1;" data-color="#6366f1" onclick="pickColor(this)"></div>
+              <div class="color-swatch" style="background:#f59e0b;" data-color="#f59e0b" onclick="pickColor(this)"></div>
+              <div class="color-swatch" style="background:#10b981;" data-color="#10b981" onclick="pickColor(this)"></div>
+              <div class="color-swatch" style="background:#ef4444;" data-color="#ef4444" onclick="pickColor(this)"></div>
+              <input type="color" id="wm-color" value="#ffffff" style="width:28px;height:28px;border-radius:6px;border:2px solid #1e2235;cursor:pointer;padding:2px;background:#0d0f14;" oninput="customColor(this)"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- Image watermark controls -->
+        <div id="image-controls" class="hidden">
+          <div class="drop-zone mb-3" id="logo-zone" onclick="document.getElementById('logo-input').click()">
+            <input type="file" id="logo-input" accept="image/*" class="hidden" onchange="loadLogoFile(this)"/>
+            <div id="logo-prompt" class="flex flex-col items-center py-6 gap-2">
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="#4b5280" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="#4b5280"/><path d="M21 15l-5-5L5 21" stroke="#4b5280" stroke-width="2" stroke-linecap="round"/></svg>
+              <div class="text-xs" style="color:#4b5280;">Upload logo / image</div>
+            </div>
+            <div id="logo-info" class="hidden px-4 py-3 flex items-center gap-2">
+              <div class="text-xs font-medium" id="logo-name" style="color:#a0aec0;"></div>
+              <button onclick="clearLogo(event)" class="ml-auto text-xs ghost-btn py-1 px-2">✕</button>
+            </div>
+          </div>
+          <div>
+            <div class="label mb-1">Logo Scale <span id="logo-scale-val" class="mono" style="color:#6366f1;">20%</span></div>
+            <input type="range" class="range-input" id="logo-scale" min="5" max="80" value="20" oninput="document.getElementById('logo-scale-val').textContent=this.value+'%'; render()"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Position & Tiling -->
+      <div class="panel p-4 mb-4">
+        <div class="label mb-3">Position</div>
+        <div class="flex items-center gap-4 mb-4">
+          <div class="pos-grid" id="pos-grid">
+            <div class="pos-cell selected" data-pos="top-left" onclick="setPos(this)">⬉</div>
+            <div class="pos-cell" data-pos="top-center" onclick="setPos(this)">⬆</div>
+            <div class="pos-cell" data-pos="top-right" onclick="setPos(this)">⬈</div>
+            <div class="pos-cell" data-pos="middle-left" onclick="setPos(this)">⬅</div>
+            <div class="pos-cell" data-pos="center" onclick="setPos(this)">✛</div>
+            <div class="pos-cell" data-pos="middle-right" onclick="setPos(this)">➡</div>
+            <div class="pos-cell" data-pos="bottom-left" onclick="setPos(this)">⬋</div>
+            <div class="pos-cell" data-pos="bottom-center" onclick="setPos(this)">⬇</div>
+            <div class="pos-cell" data-pos="bottom-right" onclick="setPos(this)">⬊</div>
+          </div>
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <input type="checkbox" id="tile-mode" class="w-4 h-4 cursor-pointer" style="accent-color:#6366f1;" onchange="toggleTile()"/>
+              <label for="tile-mode" class="text-sm cursor-pointer" style="color:#a0aec0;">Tile / repeat</label>
+            </div>
+            <div class="text-xs" style="color:#4b5280;">Covers entire image</div>
+          </div>
+        </div>
+
+        <!-- Padding -->
+        <div class="flex gap-3">
+          <div class="flex-1">
+            <div class="label mb-1">Offset X <span id="offset-x-val" class="mono" style="color:#6366f1;">20px</span></div>
+            <input type="range" class="range-input" id="offset-x" min="0" max="100" value="20" oninput="document.getElementById('offset-x-val').textContent=this.value+'px'; render()"/>
+          </div>
+          <div class="flex-1">
+            <div class="label mb-1">Offset Y <span id="offset-y-val" class="mono" style="color:#6366f1;">20px</span></div>
+            <input type="range" class="range-input" id="offset-y" min="0" max="100" value="20" oninput="document.getElementById('offset-y-val').textContent=this.value+'px'; render()"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Appearance -->
+      <div class="panel p-4 mb-4">
+        <div class="label mb-3">Appearance</div>
+        <div class="mb-4">
+          <div class="label mb-1">Opacity <span id="opacity-val" class="mono" style="color:#6366f1;">50%</span></div>
+          <input type="range" class="range-input" id="wm-opacity" min="5" max="100" value="50" oninput="document.getElementById('opacity-val').textContent=this.value+'%'; render()"/>
+        </div>
+        <div class="mb-4">
+          <div class="label mb-1">Rotation <span id="rotation-val" class="mono" style="color:#6366f1;">0°</span></div>
+          <input type="range" class="range-input" id="wm-rotation" min="-180" max="180" value="0" oninput="document.getElementById('rotation-val').textContent=this.value+'°'; render()"/>
+        </div>
+        <div id="shadow-controls">
+          <hr class="section-divider"/>
+          <div class="label mb-2">Shadow</div>
+          <div class="flex gap-3 mb-3">
+            <div class="flex-1">
+              <div class="label mb-1">Blur <span id="shadow-blur-val" class="mono" style="color:#6366f1;">0</span></div>
+              <input type="range" class="range-input" id="shadow-blur" min="0" max="20" value="0" oninput="document.getElementById('shadow-blur-val').textContent=this.value; render()"/>
+            </div>
+            <div class="flex-1">
+              <div class="label mb-1">Spread <span id="shadow-spread-val" class="mono" style="color:#6366f1;">0</span></div>
+              <input type="range" class="range-input" id="shadow-spread" min="0" max="10" value="0" oninput="document.getElementById('shadow-spread-val').textContent=this.value; render()"/>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Export -->
+      <div class="panel p-4">
+        <div class="label mb-3">Export</div>
+        <div class="mb-3">
+          <div class="label mb-1">Format</div>
+          <div class="flex gap-2">
+            <button class="ghost-btn flex-1 justify-center text-xs" id="fmt-png" onclick="setFormat('png',this)">PNG</button>
+            <button class="ghost-btn flex-1 justify-center text-xs" id="fmt-jpg" onclick="setFormat('jpg',this)">JPG</button>
+            <button class="ghost-btn flex-1 justify-center text-xs" id="fmt-webp" onclick="setFormat('webp',this)">WEBP</button>
+          </div>
+        </div>
+        <div id="quality-row" class="hidden mb-3">
+          <div class="label mb-1">Quality <span id="quality-val" class="mono" style="color:#6366f1;">90%</span></div>
+          <input type="range" class="range-input" id="export-quality" min="10" max="100" value="90" oninput="document.getElementById('quality-val').textContent=this.value+'%'"/>
+        </div>
+        <button class="accent-btn w-full justify-center" id="download-btn" onclick="downloadImage()" disabled>
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Download Image
+        </button>
+      </div>
+
+    </aside>
+
+    <!-- RIGHT: Canvas Preview -->
+    <div class="flex-1 flex flex-col" style="background:#0a0c11;">
+      <div class="flex items-center justify-between px-6 py-3" style="border-bottom:1px solid #1e2235;">
+        <div class="text-sm font-medium" style="color:#6b7280;">Live Preview</div>
+        <div class="flex items-center gap-3">
+          <div class="badge" id="canvas-dims" style="display:none;">—</div>
+          <button class="ghost-btn text-xs py-1.5" onclick="resetZoom()" id="zoom-btn" style="display:none;">Fit to screen</button>
+        </div>
+      </div>
+      <div class="flex-1 flex items-center justify-center p-8" id="canvas-container">
+
+        <!-- Empty state -->
+        <div id="empty-state" class="flex flex-col items-center gap-5 text-center">
+          <div style="background:#13161f; border:1px solid #1e2235; border-radius:20px;" class="w-20 h-20 flex items-center justify-center">
+            <svg width="36" height="36" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3" stroke="#2a2f4a" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="#2a2f4a"/><path d="M21 15l-5-5L5 21" stroke="#2a2f4a" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <div class="text-base font-semibold mb-1" style="color:#2a2f4a;">No image loaded</div>
+            <div class="text-sm" style="color:#1e2235;">Upload a source image to see the live preview</div>
+          </div>
+          <button class="accent-btn" onclick="document.getElementById('file-input').click()">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Upload Image
+          </button>
+        </div>
+
+        <canvas id="canvas" style="display:none; box-shadow:0 25px 60px rgba(0,0,0,.6); max-width:100%; max-height:75vh;"></canvas>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <span id="toast-msg">Done!</span>
+</div>
+
+<script>
+  let sourceImg = null;
+  let logoImg = null;
+  let activeTab = 'text';
+  let activePos = 'top-left';
+  let tileMode = false;
+  let activeFormat = 'png';
+  let wmColor = '#ffffff';
+
+  // ── File handling ──────────────────────────────────────────
+  const fileInput = document.getElementById('file-input');
+  const dropZone = document.getElementById('drop-zone');
+
+  fileInput.addEventListener('change', e => { if(e.target.files[0]) loadFile(e.target.files[0]); });
+
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault(); dropZone.classList.remove('drag-over');
+    if(e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
+  });
+
+  function loadFile(file) {
+    if(!file.type.startsWith('image/')) return showToast('Only image files supported');
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      sourceImg = img;
+      document.getElementById('upload-prompt').classList.add('hidden');
+      document.getElementById('upload-info').classList.remove('hidden');
+      document.getElementById('file-name').textContent = file.name;
+      document.getElementById('file-dims').textContent = img.width + ' × ' + img.height + ' px · ' + (file.size/1024).toFixed(0) + ' KB';
+      document.getElementById('canvas-dims').textContent = img.width + ' × ' + img.height;
+      document.getElementById('canvas-dims').style.display = '';
+      document.getElementById('zoom-btn').style.display = '';
+      document.getElementById('download-btn').disabled = false;
+      document.getElementById('empty-state').style.display = 'none';
+      document.getElementById('canvas').style.display = '';
+      render();
+    };
+    img.src = url;
+  }
+
+  function clearImage(e) {
+    e.stopPropagation();
+    sourceImg = null;
+    fileInput.value = '';
+    document.getElementById('upload-prompt').classList.remove('hidden');
+    document.getElementById('upload-info').classList.add('hidden');
+    document.getElementById('canvas-dims').style.display = 'none';
+    document.getElementById('zoom-btn').style.display = 'none';
+    document.getElementById('download-btn').disabled = true;
+    document.getElementById('empty-state').style.display = '';
+    document.getElementById('canvas').style.display = 'none';
+  }
+
+  function loadLogoFile(input) {
+    const file = input.files[0]; if(!file) return;
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      logoImg = img;
+      document.getElementById('logo-prompt').classList.add('hidden');
+      document.getElementById('logo-info').classList.remove('hidden');
+      document.getElementById('logo-name').textContent = file.name;
+      render();
+    };
+    img.src = url;
+  }
+
+  function clearLogo(e) {
+    e.stopPropagation();
+    logoImg = null;
+    document.getElementById('logo-input').value = '';
+    document.getElementById('logo-prompt').classList.remove('hidden');
+    document.getElementById('logo-info').classList.add('hidden');
+    render();
+  }
+
+  // ── Tab switch ─────────────────────────────────────────────
+  function switchTab(tab) {
+    activeTab = tab;
+    document.getElementById('tab-text').classList.toggle('active', tab==='text');
+    document.getElementById('tab-image').classList.toggle('active', tab==='image');
+    document.getElementById('text-controls').classList.toggle('hidden', tab!=='text');
+    document.getElementById('image-controls').classList.toggle('hidden', tab!=='image');
+    document.getElementById('shadow-controls').style.display = tab==='text' ? '' : 'none';
+    render();
+  }
+
+  // ── Position ──────────────────────────────────────────────
+  function setPos(el) {
+    document.querySelectorAll('.pos-cell').forEach(c=>c.classList.remove('selected'));
+    el.classList.add('selected');
+    activePos = el.dataset.pos;
+    render();
+  }
+
+  function toggleTile() {
+    tileMode = document.getElementById('tile-mode').checked;
+    document.querySelectorAll('.pos-cell').forEach(c=>c.style.opacity=tileMode?'.3':'1');
+    render();
+  }
+
+  // ── Color ─────────────────────────────────────────────────
+  function pickColor(el) {
+    document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('selected'));
+    el.classList.add('selected');
+    wmColor = el.dataset.color;
+    document.getElementById('wm-color').value = wmColor;
+    render();
+  }
+  function customColor(input) {
+    wmColor = input.value;
+    document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('selected'));
+    render();
+  }
+
+  // ── Format ────────────────────────────────────────────────
+  function setFormat(fmt, btn) {
+    activeFormat = fmt;
+    ['fmt-png','fmt-jpg','fmt-webp'].forEach(id=>{
+      const b = document.getElementById(id);
+      b.style.background = '';
+      b.style.color = '';
+      b.style.borderColor = '';
+    });
+    btn.style.background = '#6366f1';
+    btn.style.color = 'white';
+    btn.style.borderColor = '#6366f1';
+    document.getElementById('quality-row').classList.toggle('hidden', fmt==='png');
+  }
+
+  // set default
+  document.getElementById('fmt-png').style.background = '#6366f1';
+  document.getElementById('fmt-png').style.color = 'white';
+  document.getElementById('fmt-png').style.borderColor = '#6366f1';
+
+  function resetZoom() { render(); }
+
+  // ── Main render ───────────────────────────────────────────
+  function render() {
+    if(!sourceImg) return;
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = sourceImg.naturalWidth;
+    canvas.height = sourceImg.naturalHeight;
+    ctx.drawImage(sourceImg, 0, 0);
+
+    const opacity = parseInt(document.getElementById('wm-opacity').value) / 100;
+    const rotation = (parseInt(document.getElementById('wm-rotation').value) * Math.PI) / 180;
+    const offX = parseInt(document.getElementById('offset-x').value);
+    const offY = parseInt(document.getElementById('offset-y').value);
+
+    if(activeTab === 'text') {
+      drawTextWatermark(ctx, canvas.width, canvas.height, opacity, rotation, offX, offY);
+    } else {
+      if(logoImg) drawImageWatermark(ctx, canvas.width, canvas.height, opacity, rotation, offX, offY);
+    }
+  }
+
+  function drawTextWatermark(ctx, W, H, opacity, rotation, offX, offY) {
+    const text = document.getElementById('wm-text').value || '© Watermark';
+    const size = parseInt(document.getElementById('wm-size').value) || 32;
+    const font = document.getElementById('wm-font').value;
+    const style = document.getElementById('wm-style').value;
+    const shadowBlur = parseInt(document.getElementById('shadow-blur').value);
+    const shadowSpread = parseInt(document.getElementById('shadow-spread').value);
+
+    ctx.font = `${style} ${size}px ${font}`;
+    const metrics = ctx.measureText(text);
+    const tw = metrics.width;
+    const th = size;
+
+    if(tileMode) {
+      drawTiled(ctx, W, H, opacity, rotation, (cx, cy) => {
+        applyText(ctx, text, size, font, style, cx, cy, opacity, shadowBlur, shadowSpread);
+      }, tw + 40, th + 30);
+    } else {
+      const [cx, cy] = getAnchor(activePos, W, H, tw, th, offX, offY);
+      ctx.save();
+      ctx.translate(cx + tw/2, cy + th/2);
+      ctx.rotate(rotation);
+      applyText(ctx, text, size, font, style, -tw/2, -th/2, opacity, shadowBlur, shadowSpread);
+      ctx.restore();
+    }
+  }
+
+  function applyText(ctx, text, size, font, style, x, y, opacity, shadowBlur, shadowSpread) {
+    ctx.globalAlpha = opacity;
+    ctx.font = `${style} ${size}px ${font}`;
+    ctx.fillStyle = wmColor;
+    if(shadowBlur > 0 || shadowSpread > 0) {
+      ctx.shadowColor = 'rgba(0,0,0,0.5)';
+      ctx.shadowBlur = shadowBlur * 3;
+      ctx.shadowOffsetX = shadowSpread;
+      ctx.shadowOffsetY = shadowSpread;
+    } else {
+      ctx.shadowBlur = 0; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0;
+    }
+    ctx.fillText(text, x, y + size);
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0;
+  }
+
+  function drawImageWatermark(ctx, W, H, opacity, rotation, offX, offY) {
+    const scalePct = parseInt(document.getElementById('logo-scale').value) / 100;
+    const maxDim = Math.min(W, H) * scalePct;
+    const scale = Math.min(maxDim / logoImg.naturalWidth, maxDim / logoImg.naturalHeight);
+    const lw = logoImg.naturalWidth * scale;
+    const lh = logoImg.naturalHeight * scale;
+
+    if(tileMode) {
+      drawTiled(ctx, W, H, opacity, rotation, (cx, cy) => {
+        ctx.globalAlpha = opacity;
+        ctx.drawImage(logoImg, cx, cy, lw, lh);
+        ctx.globalAlpha = 1;
+      }, lw + 20, lh + 20);
+    } else {
+      const [cx, cy] = getAnchor(activePos, W, H, lw, lh, offX, offY);
+      ctx.save();
+      ctx.translate(cx + lw/2, cy + lh/2);
+      ctx.rotate(rotation);
+      ctx.globalAlpha = opacity;
+      ctx.drawImage(logoImg, -lw/2, -lh/2, lw, lh);
+      ctx.globalAlpha = 1;
+      ctx.restore();
+    }
+  }
+
+  function drawTiled(ctx, W, H, opacity, rotation, drawFn, stepX, stepY) {
+    const cols = Math.ceil(W / stepX) + 2;
+    const rows = Math.ceil(H / stepY) + 2;
+    for(let r = 0; r < rows; r++) {
+      for(let c = 0; c < cols; c++) {
+        const cx = c * stepX - stepX/2 + (r % 2 ? stepX/2 : 0);
+        const cy = r * stepY - stepY/2;
+        ctx.save();
+        ctx.translate(cx + stepX/2, cy + stepY/2);
+        ctx.rotate(rotation);
+        ctx.translate(-stepX/2, -stepY/2);
+        drawFn(0, 0);
+        ctx.restore();
+      }
+    }
+  }
+
+  function getAnchor(pos, W, H, ww, wh, offX, offY) {
+    let x = offX, y = offY;
+    if(pos.includes('right')) x = W - ww - offX;
+    else if(pos.includes('center') && !pos.includes('top') && !pos.includes('bottom')) x = W/2 - ww/2;
+    else if(pos === 'top-center' || pos === 'bottom-center') x = W/2 - ww/2;
+    if(pos.includes('bottom')) y = H - wh - offY;
+    else if(pos === 'center') y = H/2 - wh/2;
+    else if(pos.includes('middle')) y = H/2 - wh/2;
+    return [x, y];
+  }
+
+  // ── Download ──────────────────────────────────────────────
+  function downloadImage() {
+    if(!sourceImg) return;
+    const canvas = document.getElementById('canvas');
+    const quality = parseInt(document.getElementById('export-quality').value) / 100;
+    const mime = activeFormat === 'jpg' ? 'image/jpeg' : activeFormat === 'webp' ? 'image/webp' : 'image/png';
+    const ext = activeFormat;
+    const url = canvas.toDataURL(mime, quality);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `watermarked-image.${ext}`;
+    a.click();
+    showToast('Image downloaded!');
+  }
+
+  // ── Toast ─────────────────────────────────────────────────
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toast-msg').textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  // ── Header bg on scroll ──────────────────────────────────
+  window.addEventListener('scroll', () => {
+    document.getElementById('app-header').style.background = window.scrollY > 10 ? '#0d0f14' : 'transparent';
+  });
+</script>
+</body>
+</html>
