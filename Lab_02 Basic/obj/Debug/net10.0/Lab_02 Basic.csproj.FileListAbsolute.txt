@@ -1,0 +1,14 @@
+D:\CSE Sem-5 (A-A2) Subject\(NET) ASP .NET\ASP.NET Core Lab Solution\Lab_02 Basic\obj\Debug\net10.0\Lab_02 Basic.GeneratedMSBuildEditorConfig.editorconfig
+D:\CSE Sem-5 (A-A2) Subject\(NET) ASP .NET\ASP.NET Core Lab Solution\Lab_02 Basic\obj\Debug\net10.0\Lab_02 Basic.AssemblyInfoInputs.cache
+D:\CSE Sem-5 (A-A2) Subject\(NET) ASP .NET\ASP.NET Core Lab Solution\Lab_02 Basic\obj\Debug\net10.0\Lab_02 Basic.AssemblyInfo.cs
+D:\CSE Sem-5 (A-A2) Subject\(NET) ASP .NET\ASP.NET Core Lab Solution\Lab_02 Basic\obj\Debug\net10.0\Lab_02 Basic.csproj.CoreCompileInputs.cache
+D:\CSE Sem-5 (A-A2) Subject\(NET) ASP .NET\ASP.NET Core Lab Solution\Lab_02 Basic\bin\Debug\net10.0\Lab_02 Basic.exe
+D:\CSE Sem-5 (A-A2) Subject\(NET) ASP .NET\ASP.NET Core Lab Solution\Lab_02 Basic\bin\Debug\net10.0\Lab_02 Basic.deps.json
+D:\CSE Sem-5 (A-A2) Subject\(NET) ASP .NET\ASP.NET Core Lab Solution\Lab_02 Basic\bin\Debug\net10.0\Lab_02 Basic.runtimeconfig.json
+D:\CSE Sem-5 (A-A2) Subject\(NET) ASP .NET\ASP.NET Core Lab Solution\Lab_02 Basic\bin\Debug\net10.0\Lab_02 Basic.dll
+D:\CSE Sem-5 (A-A2) Subject\(NET) ASP .NET\ASP.NET Core Lab Solution\Lab_02 Basic\bin\Debug\net10.0\Lab_02 Basic.pdb
+D:\CSE Sem-5 (A-A2) Subject\(NET) ASP .NET\ASP.NET Core Lab Solution\Lab_02 Basic\obj\Debug\net10.0\Lab_02 Basic.dll
+D:\CSE Sem-5 (A-A2) Subject\(NET) ASP .NET\ASP.NET Core Lab Solution\Lab_02 Basic\obj\Debug\net10.0\refint\Lab_02 Basic.dll
+D:\CSE Sem-5 (A-A2) Subject\(NET) ASP .NET\ASP.NET Core Lab Solution\Lab_02 Basic\obj\Debug\net10.0\Lab_02 Basic.pdb
+D:\CSE Sem-5 (A-A2) Subject\(NET) ASP .NET\ASP.NET Core Lab Solution\Lab_02 Basic\obj\Debug\net10.0\Lab_02 Basic.genruntimeconfig.cache
+D:\CSE Sem-5 (A-A2) Subject\(NET) ASP .NET\ASP.NET Core Lab Solution\Lab_02 Basic\obj\Debug\net10.0\ref\Lab_02 Basic.dll
