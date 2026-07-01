@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Lab_06_Collection_Classes
+namespace Lab_06_Collection_Classes.Models
 {
-    internal class StudentDU
+    internal class StudentGrade
     {
         public int Id;
         public string Name;
@@ -12,7 +12,7 @@ namespace Lab_06_Collection_Classes
         public int Applitude;
         public int SQL;
 
-        public StudentDU(int Id, string Name, int CPP, int Applitude, int SQL)
+        public StudentGrade(int Id, string Name, int CPP, int Applitude, int SQL)
         {
             this.Id = Id;
             this.Name = Name;
