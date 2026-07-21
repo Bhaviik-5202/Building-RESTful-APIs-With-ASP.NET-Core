@@ -1,5 +1,4 @@
 ﻿using Lab_07_Student_API.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace StudentSubjectAPI.Controllers
@@ -37,13 +36,27 @@ namespace StudentSubjectAPI.Controllers
         [HttpPost]
         public IActionResult AddSubject(Subject subject)
         {
+            if (subject == null)
+                return BadRequest("Invalid Subject Data");
+
+            if (subjects.Any(x => x.Id == subject.Id))
+                return Conflict("Subject with this ID already exists");
+
             subjects.Add(subject);
-            return Ok("Subject Added Successfully");
+
+            return CreatedAtAction(
+                nameof(GetSubject),
+                new { id = subject.Id },
+                subject
+            );
         }
 
         [HttpPut("{id}")]
         public IActionResult UpdateSubject(int id, Subject updatedSubject)
         {
+            if (updatedSubject == null)
+                return BadRequest("Invalid Subject Data");
+
             var subject = subjects.FirstOrDefault(x => x.Id == id);
 
             if (subject == null)

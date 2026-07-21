@@ -36,13 +36,27 @@ namespace StudentSubjectAPI.Controllers
         [HttpPost]
         public IActionResult AddStudent(Student student)
         {
+            if (student == null)
+                return BadRequest("Invalid Student Data");
+
+            if (students.Any(x => x.Id == student.Id))
+                return Conflict("Student with this ID already exists");
+
             students.Add(student);
-            return Ok("Student Added Successfully");
+
+            return CreatedAtAction(
+                nameof(GetStudent),
+                new { id = student.Id },
+                student
+            );
         }
 
         [HttpPut("{id}")]
         public IActionResult UpdateStudent(int id, Student updatedStudent)
         {
+            if (updatedStudent == null)
+                return BadRequest("Invalid Student Data");
+
             var student = students.FirstOrDefault(x => x.Id == id);
 
             if (student == null)

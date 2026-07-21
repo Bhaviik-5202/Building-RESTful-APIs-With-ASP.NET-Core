@@ -26,7 +26,7 @@ namespace Lab_08_Web_API_With_Migration
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
-                app.MapScalarApiReference();
+                app.MapScalarApiReference("/");
             }
 
             app.UseHttpsRedirection();

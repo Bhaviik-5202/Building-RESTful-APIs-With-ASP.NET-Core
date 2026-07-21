@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\CSE Sem-5 (A-A2) Subject\\(NET) ASP .NET\\ASP.NET Core Lab Solution\\Lab_02 Basic\\Lab_02 Basic.csproj",
+      "projectUniqueName": "D:\\CSE Sem-5 (A-A2) Subject\\(ASP.NET) Building RESTful APIs with ASP.NET Core\\ASP.NET Core Lab Solution\\Lab_02 Basic\\Lab_02 Basic.csproj",
       "projectName": "Lab_02 Basic",
-      "projectPath": "D:\\CSE Sem-5 (A-A2) Subject\\(NET) ASP .NET\\ASP.NET Core Lab Solution\\Lab_02 Basic\\Lab_02 Basic.csproj",
+      "projectPath": "D:\\CSE Sem-5 (A-A2) Subject\\(ASP.NET) Building RESTful APIs with ASP.NET Core\\ASP.NET Core Lab Solution\\Lab_02 Basic\\Lab_02 Basic.csproj",
       "packagesPath": "C:\\Users\\Bhaviik Parmar\\.nuget\\packages\\",
-      "outputPath": "D:\\CSE Sem-5 (A-A2) Subject\\(NET) ASP .NET\\ASP.NET Core Lab Solution\\Lab_02 Basic\\obj\\",
+      "outputPath": "D:\\CSE Sem-5 (A-A2) Subject\\(ASP.NET) Building RESTful APIs with ASP.NET Core\\ASP.NET Core Lab Solution\\Lab_02 Basic\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\CSE Sem-5 (A-A2) Subject\\(NET) ASP .NET\\ASP.NET Core Lab Solution\\Lab_03 OOP\\Lab_03 OOP.csproj": {}
+    "D:\\CSE Sem-5 (A-A2) Subject\\(ASP.NET) Building RESTful APIs with ASP.NET Core\\ASP.NET Core Lab Solution\\Lab_03 OOP\\Lab_03 OOP.csproj": {}
   },
   "projects": {
-    "D:\\CSE Sem-5 (A-A2) Subject\\(NET) ASP .NET\\ASP.NET Core Lab Solution\\Lab_03 OOP\\Lab_03 OOP.csproj": {
+    "D:\\CSE Sem-5 (A-A2) Subject\\(ASP.NET) Building RESTful APIs with ASP.NET Core\\ASP.NET Core Lab Solution\\Lab_03 OOP\\Lab_03 OOP.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\CSE Sem-5 (A-A2) Subject\\(NET) ASP .NET\\ASP.NET Core Lab Solution\\Lab_03 OOP\\Lab_03 OOP.csproj",
+        "projectUniqueName": "D:\\CSE Sem-5 (A-A2) Subject\\(ASP.NET) Building RESTful APIs with ASP.NET Core\\ASP.NET Core Lab Solution\\Lab_03 OOP\\Lab_03 OOP.csproj",
         "projectName": "Lab_03 OOP",
-        "projectPath": "D:\\CSE Sem-5 (A-A2) Subject\\(NET) ASP .NET\\ASP.NET Core Lab Solution\\Lab_03 OOP\\Lab_03 OOP.csproj",
+        "projectPath": "D:\\CSE Sem-5 (A-A2) Subject\\(ASP.NET) Building RESTful APIs with ASP.NET Core\\ASP.NET Core Lab Solution\\Lab_03 OOP\\Lab_03 OOP.csproj",
         "packagesPath": "C:\\Users\\Bhaviik Parmar\\.nuget\\packages\\",
-        "outputPath": "D:\\CSE Sem-5 (A-A2) Subject\\(NET) ASP .NET\\ASP.NET Core Lab Solution\\Lab_03 OOP\\obj\\",
+        "outputPath": "D:\\CSE Sem-5 (A-A2) Subject\\(ASP.NET) Building RESTful APIs with ASP.NET Core\\ASP.NET Core Lab Solution\\Lab_03 OOP\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
